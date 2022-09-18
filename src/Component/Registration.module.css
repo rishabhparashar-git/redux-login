@@ -1,0 +1,27 @@
+.form {
+  padding: 0;
+  margin: 10px 0px;
+  display: flex;
+  flex-direction: column;
+}
+.errMsg {
+  font-size: small;
+}
+.action-container {
+  display: flex;
+  align-items: baseline;
+}
+
+.lnk {
+  margin-left: 5px;
+  font-weight: 300;
+  display: inline;
+  cursor: pointer;
+  font-size: smaller;
+  opacity: 0.9;
+  font-size: 0.7em;
+}
+.lnk:hover {
+  opacity: 1;
+  color: var(--accentColor);
+}
