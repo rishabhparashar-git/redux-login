@@ -1,23 +1,23 @@
-import { useState, createRef } from "react";
+import { useState, createRef, useEffect } from "react";
 import classes from "./Registration.module.css";
 import Input from "./UI/Input";
 import { authSliceActions } from "../store/auth";
+import { useDispatch } from "react-redux";
 
 const Login = (props) => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [userList, setUserList] = useState([]);
-
+  const [userList, setUserList] = useState(["oldData"]);
   const passInputRef = createRef();
   const emailInputRef = createRef();
+  const dispatch = useDispatch();
 
-  const getUserList = async () => {
-    const response = await fetch(
-      "https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json"
-    );
-    const responseData = await response.json();
-    const availableUsers = await responseData.users.split(",");
-    return availableUsers;
+  const getUserList = () => {
+    fetch("https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json")
+      .then((response) => response.json())
+      .then((responseData) => {
+        setUserList(responseData.users.split(","));
+      });
   };
 
   const getUserData = async (username) => {
@@ -25,14 +25,21 @@ const Login = (props) => {
       `https://quiz-app-b658e-default-rtdb.firebaseio.com/users.json`
     );
     const responseData = await response.json();
+
     let userData;
+    let token;
     for (const key in responseData) {
       if (responseData[key].userName === username) {
+        token = key;
         userData = responseData[key];
       }
     }
-    return userData;
+    return [userData, token];
   };
+
+  useEffect(() => {
+    getUserList();
+  }, []);
 
   function formSubmitHandler(event) {
     event.preventDefault();
@@ -59,9 +66,6 @@ const Login = (props) => {
     }
 
     const userOperation = async () => {
-      const fetchedUsers = await getUserList(); //set the user list state to current available users
-      setUserList(fetchedUsers);
-
       if (!userList.includes(username)) {
         setErrorMessage("User Not found, Please Register");
         setIsError(true);
@@ -70,7 +74,7 @@ const Login = (props) => {
         }, 2000);
         return;
       }
-      const userData = await getUserData(username);
+      const [userData, token] = await getUserData(username);
       if (password !== userData.password) {
         setErrorMessage("Incorrect Password");
         setIsError(true);
@@ -80,7 +84,7 @@ const Login = (props) => {
         return;
       }
       console.log("successfully logged in");
-      dispatchEvent(authSliceActions.logInHandler({ userData }));
+      dispatch(authSliceActions.logInHandler({ userData, token }));
     };
 
     userOperation();
@@ -89,17 +93,12 @@ const Login = (props) => {
   return (
     <div className="question-card">
       <p>Log In</p>
+
       <form onSubmit={formSubmitHandler} className={classes.form}>
-        <Input
-          ref={emailInputRef}
-          placeholder="Enter Email"
-          //   onChangeHandler={emailChangeHandler}
-          type="email"
-        />
+        <Input ref={emailInputRef} placeholder="Enter Email" type="email" />
         <Input
           ref={passInputRef}
           placeholder="Enter Password"
-          //   onChangeHandler={passwordChangeHandler}
           type="password"
         />
 

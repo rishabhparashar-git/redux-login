@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "question": "Which is our national tree?",
+    "answer": ["Sandal", "Shisham", "Teak", "Banyan"],
+    "correctAnswer": "Banyan"
+  },
+  {
+    "id": 2,
+    "question": "Which is our national bird ?",
+    "answer": ["Peacock", "Hen", "Ostrich", "Emu"],
+    "correctAnswer": "Peacock"
+  },
+  {
+    "id": 3,
+    "question": "Which is our national animal ?",
+    "answer": ["Lion", "Elephant", "Tiger", "Deer"],
+    "correctAnswer": "Tiger"
+  },
+  {
+    "id": 4,
+    "question": "Which is our national fruit ?",
+    "answer": ["Apple", "Peach", "Mango", "Banana"],
+    "correctAnswer": "Mango"
+  },
+  {
+    "id": 5,
+    "question": "Which is our national flower ?",
+    "answer": ["Rose", "Lotus", "Tulip", "Lily"],
+    "correctAnswer": "Lotus"
+  }
+]

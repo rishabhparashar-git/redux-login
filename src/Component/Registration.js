@@ -1,6 +1,6 @@
 import Input from "./UI/Input";
 import classes from "./Registration.module.css";
-import { createRef, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { authSliceActions } from "../store/auth";
 
@@ -8,13 +8,45 @@ const Registration = (props) => {
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [userList, setUserList] = useState([]);
-  
+
   const dispatch = useDispatch();
-  
+
   const emailInputRef = createRef();
   const nameInputRef = createRef();
   const passInputRef = createRef();
   const verificationPassInputRef = createRef();
+
+  useEffect(() => {
+    getUserList();
+  }, []);
+  // defining api call functions
+  //================================================ to get user List =================================================
+  const getUserList = async () => {
+    const response = await fetch(
+      "https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json"
+    );
+    const responseData = await response.json();
+    const availableUsers = responseData.users.split(",");
+    setUserList(availableUsers);
+  };
+
+  //================================================ to updateUserList =================================================
+  const updateUserList = (newUserList) => {
+    fetch("https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json", {
+      method: "PATCH",
+      body: JSON.stringify({
+        users: newUserList,
+      }),
+    }).then(alert("User List Updated"));
+  };
+
+  //================================================ to add user data =================================================
+  const addUserData = (userData) => {
+    fetch("https://quiz-app-b658e-default-rtdb.firebaseio.com/users.json", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    }).then(alert("User Registered"));
+  };
 
   //   =========================================================  handling user registration ======================================================================
   const formSubmitHandler = (event) => {
@@ -25,38 +57,6 @@ const Registration = (props) => {
       nameInputRef.current.value = "";
       passInputRef.current.value = "";
       verificationPassInputRef.current.value = "";
-    };
-
-    // defining api call functions
-    //================================================ to get user List =================================================
-    const getUserList = async () => {
-      const response = await fetch(
-        "https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json"
-      );
-      const responseData = await response.json();
-      const availableUsers = await responseData.users.split(",");
-      return availableUsers;
-    };
-
-    //================================================ to updateUserList =================================================
-    const updateUserList = (newUserList) => {
-      fetch(
-        "https://quiz-app-b658e-default-rtdb.firebaseio.com/userList.json",
-        {
-          method: "PATCH",
-          body: JSON.stringify({
-            users: newUserList,
-          }),
-        }
-      ).then(alert("User List Updated"));
-    };
-
-    //================================================ to add user data =================================================
-    const addUserData = (userData) => {
-      fetch("https://quiz-app-b658e-default-rtdb.firebaseio.com/users.json", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      }).then(alert("User Registered"));
     };
 
     //     validating user inputs ==================================================
@@ -106,10 +106,7 @@ const Registration = (props) => {
 
     let username = email.split("@")[0]; // separating username form email
 
-    const userOperation = async () => {
-      const fetchedUsers = await getUserList(); //set the user list state to current available users
-      setUserList(fetchedUsers);
-
+    const userOperation = () => {
       if (userList.includes(username)) {
         setErrorMessage(
           "User Already Registered Please try with different email"
@@ -121,7 +118,7 @@ const Registration = (props) => {
         return;
       } else {
         console.log("else block");
-        //creating new user here 
+        //creating new user here
         const userData = {
           name: name,
           highScore: 0,
@@ -130,12 +127,14 @@ const Registration = (props) => {
           password: password,
         };
         addUserData(userData);
-        console.log(" database users" , userList)
+        console.log(" database users", userList);
         const updatedUserList = userList.concat(username).join(",");
-        console.log("users after updation" , updatedUserList)
+        console.log("users after updation", updatedUserList);
         updateUserList(updatedUserList);
-        dispatch(authSliceActions.logInHandler(userData))
+        // dispatch(authSliceActions.logInHandler(userData));
         clearInputValues();
+        alert("You are registered Please Login");
+        props.toggleUserState(false);
       }
     };
     userOperation();
