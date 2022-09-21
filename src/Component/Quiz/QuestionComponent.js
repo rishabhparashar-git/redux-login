@@ -11,6 +11,10 @@ export default function QuestionComponent(props) {
   const [clicked, setclicked] = useState("");
   const dispatch = useDispatch();
 
+  function logOutHandler() {
+    dispatch(authSliceActions.logOutHandler());
+  }
+
   const { user: userData, token } = useSelector((state) => state.authReducer);
   console.log(userData);
 
@@ -47,6 +51,9 @@ export default function QuestionComponent(props) {
   return (
     <div className="container">
       <div className="">
+        <button className="btn" onClick={logOutHandler}>
+          LogOut
+        </button>
         <div className="profile">
           <span>{userData.name}</span>
           <span>Score : {score}</span>
